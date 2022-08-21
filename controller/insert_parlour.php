@@ -12,6 +12,6 @@
 	    $stmt = $con->prepare($sql);
 		 // execute the query
 		$stmt->execute();
-	   echo $stmt->rowCount() . "Records UPDATED successfully";
+	    echo $stmt->rowCount() . "Records UPDATED successfully";
 }
 ?>
