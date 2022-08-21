@@ -14,18 +14,18 @@ $(document).ready(function() {
         }
         });
 
-         $.ajax({
-          url: "api/api.php", //the page containing php script
-          type: "post", //request type,
-          data: {
-                'req': '1',
-                'param': '1',
-              },
-        dataType: "json",
-        success: function(result) {
-        $("#edit_parlour_name").html(result);
-        }
-        });
+        //  $.ajax({
+        //   url: "api/api.php", //the page containing php script
+        //   type: "post", //request type,
+        //   data: {
+        //         'req': '1',
+        //         'param': '1',
+        //       },
+        // dataType: "json",
+        // success: function(result) {
+        // $("#edit_parlour_name").html(result);
+        // }
+        // });
 
         $.ajax({
           url:"api/api.php", //the page containing php script
@@ -90,6 +90,18 @@ $(document).ready(function() {
               $("#edit_vat").val(dval['vat']);
               $("#edit_gross_sales").val(dval['gross']);
               $("#edit_received_date").val(dval['received_date']);
+                var p_id = dval['parlar_id'];
+                // alert(p_id);
+                $.ajax({
+                url: "api/api.php", //the page containing php script
+                type: "post", //request type,
+                data: {'req': '1', 'param': '4',  'match': p_id,
+                    },
+              dataType: "json",
+              success: function(result) {
+              $("#edit_parlour_name").html(result);
+              }
+              });
             }
          });
       });
