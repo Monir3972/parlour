@@ -41,7 +41,8 @@ switch ($param)
          $return_data = getSelectHTMLDept($sql, $match_id, '', $multi_select, true);
          break;
         case '2': 
-        $sql = 'SELECT *,(SELECT parlar_name from parlars WHERE id=`parlar_id`) as parlar_name FROM sales_records';
+        $sql = 'SELECT *,(SELECT parlar_name from parlars WHERE id=`parlar_id`) as parlar_name FROM sales_records ORDER BY id DESC';
+        // $sql = 'SELECT * FROM '.$table.' WHERE status = 1 ORDER BY id DESC';
 		  $return_data = getHTML_empTable($sql,true);
 		break;
 
@@ -49,6 +50,11 @@ switch ($param)
          $sql = 'SELECT * FROM '.$table.' WHERE  '.$data;
          $return_data = getHTML_empEditModal($sql,true);   
          break;
+
+        case '4': 
+        $sql ='SELECT * FROM '.$table.' WHERE `is_active` = 1';
+        $return_data = getSelectedHTML_lists($sql,$match_id,'',$multi_select,true);
+        break;
     }
 
     echo json_encode($return_data);
@@ -104,7 +110,7 @@ switch ($param)
 	           
 	                            <td> '.$row['entry_date'].' </td> 
 	                            <td>
-	                                <button type="button" class="btn btn-default btn-sm" id="edit_id" data-id='.$row["id"].'>Edit</button>
+	                                <button type="button" class="btn btn-default btn-sm" id="edit_id" data-id='.$row["id"].'><i class="fas fa-edit"></i></button>
 	                            </td>
 	                        </tr>  
                           ';
@@ -133,6 +139,35 @@ switch ($param)
             
             
             $rHTML =  $row;
+        }
+        catch (PDOException $e) 
+        {
+            $rHTML = $e->getMessage();
+        }
+        
+        return $rHTML;
+    }
+     function getSelectedHTML_lists($sql, $matchID, $field_name, $multisel = FALSE, $optOnly = FALSE)
+    {
+        global $con, $filter;
+        try
+        { 
+            $multi = ($multisel) ? 'multiple="multiple"' : '';
+            $field_name = ($multisel) ? $field_name.'[]' : $field_name;
+            $rHTML = '<select class="chosen-select sel2 width-100" '.$multi.' id="'.$field_name.'" name="'.$field_name.'">';
+            $rHTML = ($optOnly) ? '' : $rHTML;
+            $rHTML .= ($multisel) ? '<option value="-1">-- Select --</option>' : '<option value="0" disabled>-- Select --</option>';
+            
+            $stmt = $con->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
+            $stmt->execute();
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) 
+            {
+                if($row['id'] == $matchID)
+                    $rHTML = $rHTML . '<option value="'.$row['id'].'" selected>'.$row['parlar_name'].'</option>';
+                else
+                    $rHTML = $rHTML . '<option value="'.$row['id'].'">'.$row['parlar_name'].'</option>';
+            }
+            $rHTML = ($optOnly) ? $rHTML : $rHTML . '</select>';
         }
         catch (PDOException $e) 
         {
